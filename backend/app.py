@@ -1,27 +1,53 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 import os
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+from chatbot import BushraChatbot
+from flask import render_template
+
+
 
 # Initialize Flask app
 app = Flask(__name__, template_folder="../frontend/templates", static_folder='../frontend/static')
 
 # Set the secret key for session management
-app.secret_key = os.urandom(24)  # Randomly generated secret key for development
+app.secret_key = os.urandom(24)
 
-# Path to the SQLite database for user data
-DATABASE_PATH = r"F:\c++ Projects\123\website-test\backend\database\user_data\user_data.db"
 
-# Ensure the directory exists
-os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
 
-# Initialize database connection and create necessary tables
-def init_db():
-    """Initializes the database and creates necessary tables if they do not exist."""
-    conn = sqlite3.connect(DATABASE_PATH)
-    cursor = conn.cursor()
+# Paths to the SQLite databases
+MAIN_DATABASE_PATH = r"F:\c++ Projects\123\website-test\backend\database\mental_wellness.db"
+CHATBOT_DB_PATH = r"F:\c++ Projects\123\website-test\backend\database\chatbot_data\chatbot_data.db"
+EMOTIONS_DB_PATH = r"F:\c++ Projects\123\website-test\backend\database\emotiuons_data\emotions_data.db"
+POSTS_DIR_PATH = r"F:\c++ Projects\123\website-test\backend\database\chatbot_data"  # Directory path
+POSTS_PATH = r"F:\c++ Projects\123\website-test\backend\database\chatbot_data\posts.db"  # Actual file path
+
+# Ensure the directories exist and do not try to create files
+def ensure_directories():
+    # Ensure the necessary directories exist for MAIN_DATABASE_PATH, CHATBOT_DB_PATH, and EMOTIONS_DB_PATH
+    if not os.path.exists(os.path.dirname(MAIN_DATABASE_PATH)):
+        os.makedirs(os.path.dirname(MAIN_DATABASE_PATH), exist_ok=True)
     
-    # Create the 'users' table if it doesn't exist
+    if not os.path.exists(os.path.dirname(CHATBOT_DB_PATH)):
+        os.makedirs(os.path.dirname(CHATBOT_DB_PATH), exist_ok=True)
+    
+    if not os.path.exists(os.path.dirname(EMOTIONS_DB_PATH)):
+        os.makedirs(os.path.dirname(EMOTIONS_DB_PATH), exist_ok=True)
+
+    # Ensure the directory for POSTS_PATH exists (without accidentally creating the file)
+    if not os.path.exists(POSTS_PATH):
+        os.makedirs(POSTS_DIR_PATH, exist_ok=True)  # Corrected this line to ensure only directories are created
+
+# Call the function to ensure the directories exist
+ensure_directories()
+
+# Initialize databases and create necessary tables
+def init_databases():
+    """Initializes all databases and creates necessary tables."""
+    # Main database
+    conn = sqlite3.connect(MAIN_DATABASE_PATH)
+    cursor = conn.cursor()
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,25 +56,88 @@ def init_db():
         password TEXT NOT NULL
     )
     ''')
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS wellbeing_content (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT,
+        media_type TEXT,
+        media_url TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    ''')
+    # Insert the admin user if not already in the database
+    cursor.execute('''
+    INSERT OR IGNORE INTO users (username, email, password)
+    VALUES (?, ?, ?)
+    ''', ("admin", "admin@mentalwellness.com", generate_password_hash("admin123")))
+    conn.commit()
+    conn.close()
 
-    conn.commit()  # Commit changes
-    conn.close()   # Close the connection
+    # Chatbot database
+    conn = sqlite3.connect(CHATBOT_DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS chat_conversations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        message TEXT NOT NULL,
+        sender TEXT NOT NULL,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    ''')
+    conn.commit()
+    conn.close()
 
-# Call the init_db function to initialize the database (if not already initialized)
-init_db()
+    # Emotions database
+    conn = sqlite3.connect(EMOTIONS_DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS detected_emotions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        emotion TEXT NOT NULL,
+        confidence REAL NOT NULL,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    ''')
+    conn.commit()
+    conn.close()
 
-# Helper function to connect to the SQLite database
-def get_db_connection():
-    """Returns a connection object to interact with the database."""
-    conn = sqlite3.connect(DATABASE_PATH)
-    conn.row_factory = sqlite3.Row  # To access columns by name (not by index)
+    # Initialize the SQLite database for storing posts
+    if not os.path.exists(POSTS_PATH):  # This checks if the posts.db file already exists
+        conn = sqlite3.connect(POSTS_PATH)  # Connecting to the correct file
+        cursor = conn.cursor()
+        cursor.execute('''CREATE TABLE posts (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            title TEXT NOT NULL,
+                            content TEXT NOT NULL,
+                            image_url TEXT,
+                            video_url TEXT,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        )''')
+        conn.commit()
+        conn.close()
+
+# Initialize all databases
+init_databases()
+
+# Helper function to connect to a SQLite database
+def get_db_connection(db_path):
+    """Returns a connection object to interact with the specified database."""
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row  # To access columns by name
     return conn
 
+
+
+
 # Route for the homepage
-@app.route("/")
-def home():
-    """Render the homepage."""
-    return render_template("index.html")
+@app.route('/')
+def index():
+    logged_in = 'user_id' in session
+    return render_template('index.html', loggedIn=logged_in)
+
 
 # Route for user signup
 @app.route("/signup", methods=["GET", "POST"])
@@ -64,16 +153,18 @@ def signup():
 
         # Save the user in the database
         try:
-            with sqlite3.connect(DATABASE_PATH) as conn:
+            with get_db_connection(MAIN_DATABASE_PATH) as conn:
                 cursor = conn.cursor()
                 cursor.execute(
                     "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
                     (username, email, password_hash),
                 )
                 conn.commit()
-            return redirect(url_for("home"))  # Redirect to home after successful signup
+            flash("Signup successful! Please log in.", "success")
+            return redirect(url_for("login"))
         except sqlite3.IntegrityError:
-            return render_template("signup.html", error="Username or email already exists.")
+            flash("Username or email already exists.", "error")
+            return redirect(url_for("signup"))
 
     return render_template("signup.html")
 
@@ -82,76 +173,197 @@ def signup():
 def login():
     """Handle the login process."""
     if request.method == 'POST':
-        # Make sure these fields exist in the form
         username_or_email = request.form.get('username_or_email')
         password = request.form.get('password')
 
-
-        # Check if all required fields are present
-        if not username_or_email or not password:
-            flash("All fields are required.", "error")
-            return redirect(url_for('login'))
-
-        # Connect to the database and verify user credentials
-        conn = get_db_connection()
+        conn = get_db_connection(MAIN_DATABASE_PATH)
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM users WHERE username = ? AND email = ?', (username_or_email))
-        user = cursor.fetchone()  # Fetch user if exists
+        cursor.execute(
+            'SELECT * FROM users WHERE username = ? OR email = ?', 
+            (username_or_email, username_or_email)
+        )
+        user = cursor.fetchone()
+        conn.close()
 
         if user and check_password_hash(user['password'], password):
-            # If the user exists and password matches
-            session['user_id'] = user['id']  # Store the user's ID in the session
-            session['username'] = user['username']  # Store the username in the session
-            return redirect(url_for('dashboard'))  # Redirect to dashboard after successful login
+            session['user_id'] = user['id']
+            session['username'] = user['username']
+            flash("Login successful!", "success")
+            return redirect(url_for('dashboard'))
         else:
-            # If login fails, show an error message
-            flash('Invalid username, email or password', 'error')
-            return redirect(url_for('login'))  # Stay on the login page
+            flash('Invalid username, email, or password.', 'error')
+            return redirect(url_for('login'))
 
     return render_template('login.html')
 
+# Route for user logout
+@app.route("/logout")
+def logout():
+    """Logs out the user by clearing the session."""
+    session.clear()
+    flash("You have been logged out.", "info")
+    return redirect(url_for("login"))
 
-# Route for the dashboard (after successful login)
+# Route for the dashboard
 @app.route('/dashboard')
 def dashboard():
-    """Render the dashboard page for the logged-in user."""
     if 'user_id' not in session:
-        # If the user is not logged in, redirect to login
+        return redirect(url_for('login'))
+    return render_template('index.html', loggedIn=True)
+
+
+# Route for chatbot
+# Initialize the chatbot
+bushra = BushraChatbot()
+
+@app.route('/chatbot', methods=['GET', 'POST'])
+def chatbot():
+    """Chatbot interface for user interaction."""
+    # Check if the user is logged in
+    if 'user_id' not in session:
+        flash("Please log in to use the chatbot.", "error")
         return redirect(url_for('login'))
     
-    # Check if the logged-in user is an admin
-    if session['username'] == 'admin':
-        return redirect(url_for('create_post'))  # Redirect admin to create wellbeing posts
-    return render_template('dashboard.html')
+    user_id = session['user_id']  # Get the logged-in user's ID
+    messages = []  # Initialize a list to store chat messages
 
-# Admin route to create wellbeing posts
-@app.route("/admin/create_post", methods=["GET", "POST"])
-def create_post():
-    """Allow the admin to create wellbeing content."""
-    if 'user_id' not in session or session['username'] != 'admin':
-        # If the user is not logged in as admin, redirect to the home page
-        return redirect(url_for('home'))
-    
-    if request.method == "POST":
+    if request.method == 'POST':
+        try:
+            user_message = request.form['message']  # Get the user's message from the form
+            
+            # Process the message using the chatbot
+            chatbot_response_data = bushra.process_message(user_message)
+            chatbot_response = chatbot_response_data['response']
+            emotion = chatbot_response_data['emotion']
+            confidence = chatbot_response_data['confidence']
+            
+            # Save the user's message and chatbot's response to the chatbot database
+            with get_db_connection(CHATBOT_DB_PATH) as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "INSERT INTO chat_conversations (user_id, message, sender) VALUES (?, ?, ?)",
+                    (user_id, user_message, 'user')
+                )
+                cursor.execute(
+                    "INSERT INTO chat_conversations (user_id, message, sender) VALUES (?, ?, ?)",
+                    (user_id, chatbot_response, 'chatbot')
+                )
+                conn.commit()
+            
+            # Save the detected emotion to the emotions database
+            with get_db_connection(EMOTIONS_DB_PATH) as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "INSERT INTO detected_emotions (user_id, emotion, confidence) VALUES (?, ?, ?)",
+                    (user_id, emotion, confidence)
+                )
+                conn.commit()
+
+            # Provide feedback to the user
+            flash(f"Bushra: {chatbot_response}", "chatbot")
+        except Exception as e:
+            flash(f"An error occurred: {str(e)}", "error")
+            return redirect(url_for('chatbot'))
+
+    # Retrieve previous chat messages for the user
+    try:
+        with get_db_connection(CHATBOT_DB_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT message, sender, timestamp FROM chat_conversations WHERE user_id = ? ORDER BY timestamp",
+                (user_id,)
+            )
+            messages = cursor.fetchall()
+    except Exception as e:
+        flash(f"Could not load chat history: {str(e)}", "error")
+
+    return render_template("chatbot.html", messages=messages)
+
+
+
+
+
+# Route to add a new post (admin only)
+@app.route('/write_article', methods=['GET', 'POST'])
+def write_article():
+    """Allow the admin to write a new article."""
+    if 'user_id' not in session:
+        flash("You need to log in to write an article.", "warning")
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
         title = request.form['title']
-        description = request.form['description']
-        media_type = request.form['media_type']  # 'image', 'video', or 'text'
-        media_url = request.form['media_url']   # URL for image/video
+        content = request.form['content']
+        image_url = request.form['image_url']
+        video_url = request.form['video_url']
 
-        # Save the post to the database
-        conn = get_db_connection()
+        # Insert the new post into the database
+        conn = get_db_connection(POSTS_PATH)
         cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO wellbeing_content (title, description, media_type, media_url)
+        cursor.execute('''
+            INSERT INTO posts (title, content, image_url, video_url)
             VALUES (?, ?, ?, ?)
-        """, (title, description, media_type, media_url))
+        ''', (title, content, image_url, video_url))
         conn.commit()
         conn.close()
 
-        flash("Post created successfully", "success")
-        return redirect(url_for('wellbeing'))  # Redirect to wellbeing content page
+        flash("Article successfully added!", "success")
+        return redirect(url_for('wellbeing'))
 
-    return render_template("create_post.html")
+    return render_template('write_article.html')
+
+# Route to display wellbeing page with articles (view posts)
+@app.route('/wellbeing')
+def wellbeing():
+    """Display all articles in the wellbeing section."""
+    conn = get_db_connection(POSTS_PATH)
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM posts ORDER BY created_at DESC')  # Order by creation date
+    posts = cursor.fetchall()
+    conn.close()
+
+    return render_template('wellbeing.html', posts=posts)
+
+
+
+
+
+# Route for Guided Exercise page
+@app.route('/exercise')
+def exercise():
+    return render_template('exercise.html')
+
+# Route for Relaxation Music page
+@app.route('/music')
+def music():
+    return render_template('music.html')
+
+# Route for Guided Meditation page
+@app.route('/meditation')
+def meditation():
+    return render_template('meditation.html')
+
+# Route for Self Journaling page
+@app.route('/journaling')
+def journaling():
+    return render_template('journaling.html')
+
+
+
+
+
+
+# Route for the profile page
+@app.route('/profile')
+def profile():
+    """Render the profile page for the logged-in user."""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))  # Redirect to login if not logged in
+
+    # Here you can query the user's data or just render a simple template
+    return render_template('profile.html')  # You need to create this template
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

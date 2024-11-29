@@ -1,124 +1,82 @@
-// Wait for the DOM to be fully loaded before executing scripts
 document.addEventListener("DOMContentLoaded", () => {
-  
-    // 1. Custom Cursor
-    const cursor = document.createElement('div');
-    cursor.classList.add('cursor');
-    document.body.appendChild(cursor);
 
-    document.addEventListener('mousemove', (e) => {
-        cursor.style.left = e.pageX + 'px';
-        cursor.style.top = e.pageY + 'px';
+
+
+
+
+
+
+// Create the container for the soft pulse cursor and particle effect
+const container = document.createElement('div');
+container.classList.add('cursor-container');
+document.body.appendChild(container);
+
+// Track cursor position
+let cursorX = 0, cursorY = 0;
+
+// Create the pulsing cursor element
+const pulseCursor = document.createElement('div');
+pulseCursor.classList.add('pulse-cursor');
+container.appendChild(pulseCursor);
+
+// Function to update the cursor position
+function updateCursorPosition(x, y) {
+    pulseCursor.style.left = `${x - pulseCursor.offsetWidth / 2}px`;
+    pulseCursor.style.top = `${y - pulseCursor.offsetHeight / 2}px`;
+}
+
+// Function to create calming particles
+function createCalmingParticles(x, y) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    particle.style.left = `${x - 5}px`;
+    particle.style.top = `${y - 5}px`;
+    container.appendChild(particle);
+
+    // Particle Animation: Floating upwards slowly
+    setTimeout(() => {
+        particle.style.animation = 'floatUp 3s ease-in-out forwards';
+    }, 0);
+
+    // Fade out and disappear after animation
+    setTimeout(() => {
+        particle.remove();
+    }, 3000); // Particle fades out after 3 seconds
+}
+
+// Handle cursor movement and trigger effects
+document.addEventListener('mousemove', (e) => {
+    cursorX = e.clientX;
+    cursorY = e.clientY;
+
+    // Update cursor position
+    updateCursorPosition(cursorX, cursorY);
+
+    // Create calming particles at the cursor position
+    createCalmingParticles(cursorX, cursorY);
+});
+
+
+
+
+
+
+    // ===================== Scroll-to-top Button =====================
+    const scrollTopBtn = document.createElement('button');
+    scrollTopBtn.classList.add('scroll-top-btn');
+    scrollTopBtn.innerHTML = '↑';
+    document.body.appendChild(scrollTopBtn);
+
+    scrollTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-
-    const cursorElements = document.querySelectorAll('a, .cta-btn, .nav-link, .service-card, .testimonial-card');
-    cursorElements.forEach(element => {
-        element.addEventListener('mouseenter', () => {
-            cursor.classList.add('hovered');
-        });
-        element.addEventListener('mouseleave', () => {
-            cursor.classList.remove('hovered');
-        });
-    });
-
-    // 2. Scroll-triggered Animations
-    const elementsToAnimate = document.querySelectorAll('.animate-on-scroll');
-
-    const scrollAnimation = () => {
-        elementsToAnimate.forEach(el => {
-            const elementPosition = el.getBoundingClientRect().top;
-            const screenPosition = window.innerHeight / 1.5;
-
-            if (elementPosition < screenPosition) {
-                el.classList.add('fade-in');
-            } else {
-                el.classList.remove('fade-in');
-            }
-        });
-    };
-
-    window.addEventListener('scroll', scrollAnimation);
-    scrollAnimation(); // Run on load for elements already in view
-
-    // 3. Particle Background Animation (Basic Implementation)
-    const particles = document.querySelector('.particles');
-    let particleArray = [];
-    const numberOfParticles = 50;
-
-    function createParticle(e) {
-        const particle = document.createElement('div');
-        particle.classList.add('particle');
-        particles.appendChild(particle);
-        
-        let x = e.clientX;
-        let y = e.clientY;
-        
-        let particleStyle = {
-            position: 'absolute',
-            left: `${x}px`,
-            top: `${y}px`,
-            backgroundColor: 'var(--highlight-color)',
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            opacity: 1,
-            animation: 'particleAnimation 1s ease-out forwards'
-        };
-
-        for (let prop in particleStyle) {
-            particle.style[prop] = particleStyle[prop];
-        }
-
-        setTimeout(() => {
-            particle.remove();
-        }, 1000);
-    }
-
-    window.addEventListener('mousemove', (e) => {
-        createParticle(e);
-    });
-
-    // 4. Smooth Scroll Effect
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function (event) {
-            event.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            document.getElementById(targetId).scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        });
-    });
-
-    // 5. Sticky Navbar Effect
-    const navbar = document.querySelector('.navbar');
-    let lastScrollTop = 0;
 
     window.addEventListener('scroll', () => {
-        let scrollTop = window.scrollY;
-
-        if (scrollTop > lastScrollTop) {
-            navbar.classList.add('navbar-scrolled');
-        } else {
-            navbar.classList.remove('navbar-scrolled');
-        }
-
-        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        const showButton = document.documentElement.scrollTop > 200;
+        scrollTopBtn.classList.toggle('show', showButton);
     });
 
-    // 6. Service Card Hover Animations
-    const serviceCards = document.querySelectorAll('.service-card');
-    serviceCards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            card.classList.add('hovered');
-        });
-        card.addEventListener('mouseleave', () => {
-            card.classList.remove('hovered');
-        });
-    });
-
-    // 7. Text Animation in Hero Section
+    // ===================== Hero Section Animations =====================
     const heroText = document.querySelector('.hero h1');
     const heroParagraph = document.querySelector('.hero p');
 
@@ -127,140 +85,80 @@ document.addEventListener("DOMContentLoaded", () => {
         heroParagraph.classList.add('text-fade-in');
     }, 500);
 
-    // 8. Scroll-to-top Button
-    const scrollTopBtn = document.createElement('button');
-    scrollTopBtn.classList.add('scroll-top-btn');
-    scrollTopBtn.innerHTML = '↑';
-    document.body.appendChild(scrollTopBtn);
+    // ===================== Section Cards Animation on Scroll =====================
+    const sectionCards = document.querySelectorAll('.section-card');
+    sectionCards.forEach(card => card.classList.add('animate-on-scroll'));
 
-    scrollTopBtn.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
+    const animateOnScroll = () => {
+        sectionCards.forEach(card => {
+            const isVisible = card.getBoundingClientRect().top < window.innerHeight;
+            card.classList.toggle('fade-in', isVisible);
+        });
+    };
+    window.addEventListener('scroll', animateOnScroll);
+
+    // ===================== Handle Login State =====================
+    const signUpBtn = document.getElementById('signUpBtn');
+    const signInBtn = document.getElementById('signInBtn');
+    const dashboardBtn = document.getElementById('dashboardBtn');
+    const profileBtn = document.getElementById('profileBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    const loggedInState = JSON.parse(document.getElementById('loggedInState').textContent);
+
+    const updateUI = (loggedIn) => {
+        signUpBtn.style.display = loggedIn ? 'none' : 'inline-block';
+        signInBtn.style.display = loggedIn ? 'none' : 'inline-block';
+        dashboardBtn.style.display = loggedIn ? 'inline-block' : 'none';
+        profileBtn.style.display = loggedIn ? 'inline-block' : 'none';
+        logoutBtn.style.display = loggedIn ? 'inline-block' : 'none';
+    };
+
+    updateUI(loggedInState);
+
+    logoutBtn.addEventListener('click', () => {
+        fetch('/logout', { method: 'POST', credentials: 'include' })
+            .then(response => {
+                if (response.ok) updateUI(false);
+            });
+    });
+
+    signInBtn.addEventListener('click', () => {
+        fetch('/login', { method: 'POST', credentials: 'include' })
+            .then(response => {
+                if (response.ok) updateUI(true);
+            });
+    });
+
+    // ===================== Service Cards Click Event =====================
+    const services = {
+        wellbeing: { id: "wellbeingService", url: "wellbeing.html" },
+        talkToBushra: { id: "talkToBushraService", url: "chatbot.html" },
+        guidedExercise: { id: "guidedExerciseService", url: "exercise.html" },
+        relaxationMusic: { id: "relaxationMusicService", url: "music.html" },
+        guidedMeditation: { id: "guidedMeditationService", url: "meditation.html" },
+        selfJournaling: { id: "selfJournalingService", url: "journaling.html" }
+    };
+
+    const showLoginPrompt = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        const message = document.createElement("div");
+        message.classList.add("login-prompt");
+        message.textContent = "You must log in to access this feature.";
+        document.body.prepend(message);
+
+        setTimeout(() => message.remove(), 3000);
+    };
+
+    Object.values(services).forEach(service => {
+        const serviceCard = document.getElementById(service.id);
+        serviceCard.addEventListener("click", () => {
+            if (loggedInState) {
+                window.location.href = service.url;
+            } else {
+                showLoginPrompt();
+            }
         });
     });
-
-    window.addEventListener('scroll', () => {
-        if (document.documentElement.scrollTop > 200) {
-            scrollTopBtn.classList.add('show');
-        } else {
-            scrollTopBtn.classList.remove('show');
-        }
-    });
-
 });
-
-// CSS for additional JS functionality
-const style = document.createElement('style');
-style.innerHTML = `
-    /* Custom Cursor */
-    .cursor {
-        position: absolute;
-        border: 3px solid var(--highlight-color);
-        border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        pointer-events: none;
-        transition: width 0.3s, height 0.3s, transform 0.3s;
-    }
-    .cursor.hovered {
-        width: 50px;
-        height: 50px;
-        transform: scale(1.5);
-    }
-
-    /* Particle Animation */
-    .particle {
-        position: absolute;
-        background-color: var(--highlight-color);
-        border-radius: 50%;
-        opacity: 0;
-        animation: particleAnimation 1s ease-out forwards;
-    }
-
-    @keyframes particleAnimation {
-        0% {
-            transform: scale(1);
-            opacity: 1;
-        }
-        100% {
-            transform: scale(3);
-            opacity: 0;
-        }
-    }
-
-    /* Scroll Animations */
-    .animate-on-scroll {
-        opacity: 0;
-        transform: translateY(50px);
-        transition: opacity 0.5s, transform 0.5s;
-    }
-
-    .fade-in {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    /* Navbar Sticky Effect */
-    .navbar-scrolled {
-        background-color: var(--dark-green);
-        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Scroll-to-top Button */
-    .scroll-top-btn {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        padding: 10px 15px;
-        background-color: var(--highlight-color);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        font-size: 1.5rem;
-        cursor: pointer;
-        transition: transform 0.3s;
-        opacity: 0;
-        visibility: hidden;
-    }
-
-    .scroll-top-btn.show {
-        opacity: 1;
-        visibility: visible;
-        transform: scale(1.2);
-    }
-
-    .scroll-top-btn:hover {
-        transform: scale(1.5);
-    }
-
-    /* Hero Section Text Animations */
-    .text-slide-in {
-        animation: slideIn 1s ease-out;
-    }
-
-    .text-fade-in {
-        animation: fadeIn 1.5s ease-out;
-    }
-
-    @keyframes slideIn {
-        0% {
-            transform: translateY(-50px);
-            opacity: 0;
-        }
-        100% {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-
-    @keyframes fadeIn {
-        0% {
-            opacity: 0;
-        }
-        100% {
-            opacity: 1;
-        }
-    }
-`;
-document.head.appendChild(style);

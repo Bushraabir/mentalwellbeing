@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+
+        
+</head>
+<body>
+    <header>
+        Chatbot - Mental Wellness Companion
+    </header>
+    <main>
+        <div class="chat-box">
+            <!-- Conversation messages will be dynamically rendered here -->
+            <div class="chat-message user-message">
+                Hi, I'm feeling a bit stressed today.
+            </div>
+            <div class="chat-message bot-message">
+                I'm here to help. Can you tell me more about what's making you feel stressed?
+            </div>
+        </div>
+
+        <form class="chat-form" action="/chatbot" method="POST">
+            <input type="text" name="message" placeholder="Type your message..." required>
+            <button type="submit">Send</button>
+        </form>
+    </main>
+</body>
+</html>

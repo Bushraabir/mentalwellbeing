@@ -6,46 +6,58 @@
     <meta name="description" content="A mental wellness platform to guide and support you on your journey to mental peace and clarity. Join us to explore resources, chat with experts, and track your mental health.">
     <meta name="author" content="Mental Wellness Platform">
     <title>Mental Wellness Platform</title>
-    <!-- Link to the external CSS file (to be linked later) -->
+
+    <!-- External CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <!-- Link to Google Fonts for better typography -->
+
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Link to Animation library (e.g., AOS for scroll animations) -->
+
+    <!-- AOS (Scroll animations) -->
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
 </head>
 <body>
-    <!-- Main Navigation Section with a Sticky Navigation Bar -->
+    <!-- Header Section -->
     <header class="header" data-aos="fade-down">
         <nav class="navbar">
             <div class="logo">
-                <h2><a href="{{ url_for('home') }}" class="nav-link">Mental Wellness</a></h2>
+                <h2><a href="{{ url_for('wellbeing') }}" class="nav-link">Mental Wellness</a></h2>
             </div>
             <ul class="nav-list">
                 <li><a href="#about" class="nav-link">About Us</a></li>
                 <li><a href="#services" class="nav-link">Services</a></li>
                 <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
                 <li><a href="#cta" class="cta-btn">Join Our Team</a></li>
-                <li><a href="{{ url_for('signup') }}" class="cta-btn">Sign Up</a></li> <!-- Visible only when logged out -->
+
+                <!-- Buttons for Not Logged-in Users -->
+                <li id="signUpBtn"><a href="{{ url_for('signup') }}" class="cta-btn">Sign Up</a></li>
+                <li id="signInBtn"><a href="{{ url_for('login') }}" class="cta-btn">Log In</a></li>
+
+                <!-- User Account Section (Visible when logged in) -->
+                <li id="userButtons" style="display:none;">
+                    <button id="dashboardBtn" class="cta-btn" onclick="window.location.href='{{ url_for('dashboard') }}'">Dashboard</button>
+                    <button id="profileBtn" class="cta-btn" onclick="window.location.href='{{ url_for('profile') }}'">Profile</button>
+                    <button id="logoutBtn" class="cta-btn" onclick="window.location.href='{{ url_for('logout') }}'">Logout</button>
+                </li>
             </ul>
         </nav>
     </header>
 
-    <!-- Hero Section with Parallax Scroll Effect -->
+    <!-- Hero Section -->
     <section id="hero" class="hero" data-aos="fade-up">
         <div class="hero-content">
             <h1>Welcome to Your Journey of Mental Wellness</h1>
             <p>Start your path towards peace and clarity. We are here to guide and support you every step of the way.</p>
             <a href="#services" class="cta-btn">Explore Our Services</a>
         </div>
-        <!-- Parallax Image or Video Background -->
         <div class="hero-background">
             <video autoplay loop muted class="hero-video">
-                <source src="{{ url_for('static', filename='videos/mental-health-video.mp4') }}" type="video/mp4">
+                <source src="{{ url_for('static', filename='videos/1.mp4') }}" type="video/mp4">
             </video>
         </div>
     </section>
 
-    <!-- About Us Section with Smooth Scroll -->
+    <!-- About Us Section -->
     <section id="about" class="about" data-aos="fade-left">
         <div class="container">
             <h2>Why Mental Wellness?</h2>
@@ -56,48 +68,55 @@
         </div>
     </section>
 
-    <!-- Services Section with Hover Effects and Interactive Cards -->
     <section id="services" class="services" data-aos="fade-up">
         <div class="container">
             <h2>Our Services</h2>
             <div class="service-cards">
-                <div class="service-card" data-aos="zoom-in">
-                    <img src="{{ url_for('static', filename='images/2.jpg') }}" alt="Chat with Bushra">
-                    <h3>Talk with Bushra</h3>
+                <!-- Mental Wellbeing -->
+                <a href="{{ url_for('wellbeing') }}" class="service-card" data-aos="zoom-in" id="wellbeingService">
+                    <img src="{{ url_for('static', filename='images/2.jpg') }}" alt="Know About Mental Wellbeing">
+                    <h3>Know About Mental Wellbeing</h3>
+                    <p>Learn more about the importance of mental health and how to maintain it.</p>
+                </a>
+    
+                <!-- Talk to Bushra -->
+                <a href="{{ url_for('chatbot') }}" class="service-card" data-aos="zoom-in" id="talkToBushraService">
+                    <img src="{{ url_for('static', filename='images/3.jpg') }}" alt="Talk to Bushra">
+                    <h3>Talk to Bushra</h3>
                     <p>Your empathetic virtual companion is here to listen and help guide you through difficult moments.</p>
-                </div>
-                <div class="service-card" data-aos="zoom-in">
-                    <img src="{{ url_for('static', filename='images/3.jpg') }}" alt="Mental Wellbeing Resources">
-                    <h3>Wellbeing Resources</h3>
-                    <p>Access articles, podcasts, and videos to improve your mental health and stay balanced.</p>
-                </div>
-                <div class="service-card" data-aos="zoom-in">
-                    <img src="{{ url_for('static', filename='images/3.jpg') }}" alt="Mental Health Assessment">
-                    <h3>Take an Assessment</h3>
-                    <p>Understand your mental health status and track your progress with personalized assessments.</p>
-                </div>
+                </a>
+    
+                <!-- Guided Exercise -->
+                <a href="{{ url_for('exercise') }}" class="service-card" data-aos="zoom-in" id="guidedExerciseService">
+                    <img src="{{ url_for('static', filename='images/9.jpg') }}" alt="Guided Exercise">
+                    <h3>Guided Exercise</h3>
+                    <p>Engage in exercises designed to help reduce stress and boost your well-being.</p>
+                </a>
+    
+                <!-- Relaxation Music -->
+                <a href="{{ url_for('music') }}" class="service-card" data-aos="zoom-in" id="relaxationMusicService">
+                    <img src="{{ url_for('static', filename='images/7.jpg') }}" alt="Relaxation Music">
+                    <h3>Relaxation Music</h3>
+                    <p>Immerse yourself in soothing music to relax and unwind.</p>
+                </a>
+    
+                <!-- Guided Meditation -->
+                <a href="{{ url_for('meditation') }}" class="service-card" data-aos="zoom-in" id="guidedMeditationService">
+                    <img src="{{ url_for('static', filename='images/6.jpg') }}" alt="Guided Meditation">
+                    <h3>Guided Meditation</h3>
+                    <p>Explore meditation practices to calm your mind and enhance focus.</p>
+                </a>
+    
+                <!-- Self Journaling -->
+                <a href="{{ url_for('journaling') }}" class="service-card" data-aos="zoom-in" id="selfJournalingService">
+                    <img src="{{ url_for('static', filename='images/5.jpg') }}" alt="Self Journaling">
+                    <h3>Self Journaling</h3>
+                    <p>Record your thoughts and emotions to gain clarity and track progress.</p>
+                </a>
             </div>
         </div>
     </section>
-
-    <!-- Testimonials Section with Interactive Cards -->
-    <section id="testimonials" class="testimonials" data-aos="fade-right">
-        <div class="container">
-            <h2>What Others Are Saying</h2>
-            <div class="testimonial-cards">
-                <div class="testimonial-card" data-aos="flip-left">
-                    <img src="{{ url_for('static', filename='images/5.jpg') }}" alt="User Testimonial 1">
-                    <p>"This platform helped me understand my mental health better and gave me the tools to improve it. Bushra is always there for me!"</p>
-                    <h4>Sarah, 29</h4>
-                </div>
-                <div class="testimonial-card" data-aos="flip-left">
-                    <img src="{{ url_for('static', filename='images/6.jpg') }}" alt="User Testimonial 2">
-                    <p>"The mental health assessment was eye-opening, and the resources have been extremely helpful. I feel more balanced now."</p>
-                    <h4>Mark, 35</h4>
-                </div>
-            </div>
-        </div>
-    </section>
+    
 
     <!-- Call-to-Action Section -->
     <section id="cta" class="cta-section" data-aos="fade-up">
@@ -108,28 +127,35 @@
         </div>
     </section>
 
-    <!-- Footer Section with Animated Social Media Links -->
+    <!-- Footer -->
     <footer class="footer" data-aos="fade-up">
         <div class="footer-content">
             <p>&copy; 2024 Mental Wellness Platform | All Rights Reserved</p>
             <div class="social-links">
-                <a href="https://facebook.com" target="_blank" class="social-icon" data-aos="zoom-in">Facebook</a>
-                <a href="https://twitter.com" target="_blank" class="social-icon" data-aos="zoom-in">Twitter</a>
-                <a href="https://instagram.com" target="_blank" class="social-icon" data-aos="zoom-in">Instagram</a>
+                <a href="https://facebook.com" target="_blank" class="social-icon">Facebook</a>
+                <a href="https://twitter.com" target="_blank" class="social-icon">Twitter</a>
+                <a href="https://instagram.com" target="_blank" class="social-icon">Instagram</a>
             </div>
         </div>
     </footer>
 
-    <!-- Link to external JS files for interactivity and animation -->
+    <!-- External JS -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 
-    <!-- Initialize AOS Animation -->
+    <!-- JavaScript -->
     <script>
+        // Initialize AOS Animations
         AOS.init({
             easing: 'ease-out-back',
-            duration: 1000
+            duration: 1000,
         });
+
+        // Update UI based on login state
+        const loggedIn = {{ loggedIn | tojson | safe }};
+        document.getElementById('signUpBtn').style.display = loggedIn ? 'none' : 'block';
+        document.getElementById('signInBtn').style.display = loggedIn ? 'none' : 'block';
+        document.getElementById('userButtons').style.display = loggedIn ? 'flex' : 'none';
     </script>
 </body>
 </html>

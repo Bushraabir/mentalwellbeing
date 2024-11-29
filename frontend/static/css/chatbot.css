@@ -1,0 +1,209 @@
+/* ===================== General Styles ===================== */
+body {
+    font-family: 'Poppins', Arial, sans-serif; /* Premium font for modern UI */
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #f9f9f9, #eaeaea); /* Light gradient background */
+    color: #333; /* Neutral text color for better contrast */
+}
+
+/* ===================== Header ===================== */
+header {
+    background: linear-gradient(90deg, #4caf50, #66bb6a); /* Modern gradient */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 28px; /* Slightly larger for better emphasis */
+    font-weight: 600;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for premium effect */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Header elevation */
+}
+
+/* ===================== Main Container ===================== */
+main {
+    max-width: 800px; /* Wider layout for better readability */
+    margin: 30px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px; /* Softer corners */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Deep shadow for premium card effect */
+    animation: fade-in 0.8s ease-in-out; /* Smooth entrance animation */
+}
+
+/* ===================== Chat Box ===================== */
+.chat-box {
+    max-height: 500px; /* More space for messages */
+    overflow-y: auto;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: box-shadow 0.3s ease; /* Smooth shadow on focus */
+}
+
+.chat-box:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Elevates chat box on hover */
+}
+
+/* ===================== Chat Messages ===================== */
+.chat-message {
+    padding: 12px 15px;
+    border-radius: 12px; /* Rounded corners for modern look */
+    max-width: 70%;
+    word-wrap: break-word;
+    font-size: 16px;
+    font-weight: 400;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05); /* Soft shadow for depth */
+    animation: slide-in 0.5s ease; /* Animated appearance for each message */
+}
+
+/* User Message */
+.user-message {
+    background: linear-gradient(135deg, #e9f5f1, #d4eade);
+    align-self: flex-start;
+    border: 1px solid #c4dfce;
+}
+
+/* Bot Message */
+.bot-message {
+    background: linear-gradient(135deg, #e8e9ec, #d9dadf);
+    align-self: flex-end;
+    border: 1px solid #c4c6ca;
+}
+
+/* ===================== Chat Form ===================== */
+.chat-form {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-form input[type="text"] {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chat-form input[type="text"]:focus {
+    border-color: #4caf50;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.chat-form button {
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #4caf50, #45a049);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.3s ease;
+}
+
+.chat-form button:hover {
+    background: linear-gradient(135deg, #45a049, #388e3c);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ===================== Scrollbar Customization ===================== */
+.chat-box::-webkit-scrollbar {
+    width: 10px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #c4c6ca, #d9dadf);
+    border-radius: 6px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* ===================== Login Prompt Message ===================== */
+.login-prompt {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, #f44336, #e53935);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    animation: fade-in-out 4s ease-out;
+}
+
+@keyframes fade-in-out {
+    0% { opacity: 0; transform: translateY(-20px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-20px); }
+}
+
+/* ===================== Service Cards ===================== */
+.service-card {
+    cursor: pointer;
+    border: 2px solid #ddd;
+    background: white;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    border-radius: 12px; /* Rounded corners for premium look */
+    overflow: hidden; /* For smooth edges */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Card elevation */
+}
+
+.service-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    border-color: #4caf50;
+}
+
+.service-card:active {
+    transform: scale(1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ===================== Animations ===================== */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+

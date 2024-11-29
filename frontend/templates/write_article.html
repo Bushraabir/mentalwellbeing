@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write Article</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('wellbeing') }}">Mental Wellbeing</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="write-article">
+            <h1>Write a New Article</h1>
+            <form method="POST">
+                <div>
+                    <label for="title">Article Title</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                <div>
+                    <label for="content">Article Content</label>
+                    <textarea id="content" name="content" rows="4" required></textarea>
+                </div>
+                <div>
+                    <label for="image_url">Image URL (Optional)</label>
+                    <input type="text" id="image_url" name="image_url">
+                </div>
+                <div>
+                    <label for="video_url">Video URL (Optional)</label>
+                    <input type="text" id="video_url" name="video_url">
+                </div>
+                <div>
+                    <button type="submit">Submit Article</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Mental Wellness Platform. All rights reserved.</p>
+    </footer>
+</body>
+</html>
