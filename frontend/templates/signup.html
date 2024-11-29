@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A mental wellness platform to guide and support you on your journey to mental peace and clarity. Join us to explore resources, chat with experts, and track your mental health.">
+    <meta name="author" content="Mental Wellness Platform">
+    <title>Sign Up - Mental Wellness Platform</title>
+    <!-- Link to the external CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="hero">
+        <div class="hero-overlay">
+            <nav class="navbar">
+                <ul class="nav-list">
+                    <li><a href="{{ url_for('home') }}" class="nav-link">Home</a></li>
+                    <li><a href="{{ url_for('signup') }}" class="nav-link">Sign Up</a></li>
+                    <li><a href="{{ url_for('login') }}" class="nav-link">Login</a></li>
+
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Sign Up Form Section -->
+    <section class="signup-section">
+        <div class="container">
+            <h2>Create an Account</h2>
+            <p>Fill in the form below to create your account and start your mental wellness journey.</p>
+
+            <!-- Form to handle POST request for signing up -->
+            <form method="POST" action="{{ url_for('signup') }}">
+                <!-- Show error message if any -->
+                {% if error %}
+                    <div class="error-message">
+                        <p>{{ error }}</p>
+                    </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="Enter your username">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                </div>
+
+                <button type="submit" class="cta-btn">Sign Up</button>
+            </form>
+
+            <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Mental Wellness Platform | All Rights Reserved</p>
+            <div class="social-links">
+                <a href="https://facebook.com" target="_blank" class="social-icon">Facebook</a>
+                <a href="https://twitter.com" target="_blank" class="social-icon">Twitter</a>
+                <a href="https://instagram.com" target="_blank" class="social-icon">Instagram</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Link to external JS file -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

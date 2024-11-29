@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A mental wellness platform to guide and support you on your journey to mental peace and clarity. Join us to explore resources, chat with experts, and track your mental health.">
+    <meta name="author" content="Mental Wellness Platform">
+    <title>Mental Wellness Platform</title>
+    <!-- Link to the external CSS file (to be linked later) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Link to Google Fonts for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Link to Animation library (e.g., AOS for scroll animations) -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+</head>
+<body>
+    <!-- Main Navigation Section with a Sticky Navigation Bar -->
+    <header class="header" data-aos="fade-down">
+        <nav class="navbar">
+            <div class="logo">
+                <h2><a href="{{ url_for('home') }}" class="nav-link">Mental Wellness</a></h2>
+            </div>
+            <ul class="nav-list">
+                <li><a href="#about" class="nav-link">About Us</a></li>
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
+                <li><a href="#cta" class="cta-btn">Join Our Team</a></li>
+                <li><a href="{{ url_for('signup') }}" class="cta-btn">Sign Up</a></li> <!-- Visible only when logged out -->
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section with Parallax Scroll Effect -->
+    <section id="hero" class="hero" data-aos="fade-up">
+        <div class="hero-content">
+            <h1>Welcome to Your Journey of Mental Wellness</h1>
+            <p>Start your path towards peace and clarity. We are here to guide and support you every step of the way.</p>
+            <a href="#services" class="cta-btn">Explore Our Services</a>
+        </div>
+        <!-- Parallax Image or Video Background -->
+        <div class="hero-background">
+            <video autoplay loop muted class="hero-video">
+                <source src="{{ url_for('static', filename='videos/mental-health-video.mp4') }}" type="video/mp4">
+            </video>
+        </div>
+    </section>
+
+    <!-- About Us Section with Smooth Scroll -->
+    <section id="about" class="about" data-aos="fade-left">
+        <div class="container">
+            <h2>Why Mental Wellness?</h2>
+            <p>Our mental health is a crucial part of our overall well-being. Learn why it’s important to nurture and care for your mind just like your body.</p>
+            <div class="about-image">
+                <img src="{{ url_for('static', filename='images/1.jpg') }}" alt="Mental Wellness Illustration">
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section with Hover Effects and Interactive Cards -->
+    <section id="services" class="services" data-aos="fade-up">
+        <div class="container">
+            <h2>Our Services</h2>
+            <div class="service-cards">
+                <div class="service-card" data-aos="zoom-in">
+                    <img src="{{ url_for('static', filename='images/2.jpg') }}" alt="Chat with Bushra">
+                    <h3>Talk with Bushra</h3>
+                    <p>Your empathetic virtual companion is here to listen and help guide you through difficult moments.</p>
+                </div>
+                <div class="service-card" data-aos="zoom-in">
+                    <img src="{{ url_for('static', filename='images/3.jpg') }}" alt="Mental Wellbeing Resources">
+                    <h3>Wellbeing Resources</h3>
+                    <p>Access articles, podcasts, and videos to improve your mental health and stay balanced.</p>
+                </div>
+                <div class="service-card" data-aos="zoom-in">
+                    <img src="{{ url_for('static', filename='images/3.jpg') }}" alt="Mental Health Assessment">
+                    <h3>Take an Assessment</h3>
+                    <p>Understand your mental health status and track your progress with personalized assessments.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section with Interactive Cards -->
+    <section id="testimonials" class="testimonials" data-aos="fade-right">
+        <div class="container">
+            <h2>What Others Are Saying</h2>
+            <div class="testimonial-cards">
+                <div class="testimonial-card" data-aos="flip-left">
+                    <img src="{{ url_for('static', filename='images/5.jpg') }}" alt="User Testimonial 1">
+                    <p>"This platform helped me understand my mental health better and gave me the tools to improve it. Bushra is always there for me!"</p>
+                    <h4>Sarah, 29</h4>
+                </div>
+                <div class="testimonial-card" data-aos="flip-left">
+                    <img src="{{ url_for('static', filename='images/6.jpg') }}" alt="User Testimonial 2">
+                    <p>"The mental health assessment was eye-opening, and the resources have been extremely helpful. I feel more balanced now."</p>
+                    <h4>Mark, 35</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call-to-Action Section -->
+    <section id="cta" class="cta-section" data-aos="fade-up">
+        <div class="container">
+            <h2>Start Your Wellness Journey</h2>
+            <p>Join our community today. It's free, and we're here to support you every step of the way!</p>
+            <a href="{{ url_for('signup') }}" class="cta-btn">Sign Up Now</a>
+        </div>
+    </section>
+
+    <!-- Footer Section with Animated Social Media Links -->
+    <footer class="footer" data-aos="fade-up">
+        <div class="footer-content">
+            <p>&copy; 2024 Mental Wellness Platform | All Rights Reserved</p>
+            <div class="social-links">
+                <a href="https://facebook.com" target="_blank" class="social-icon" data-aos="zoom-in">Facebook</a>
+                <a href="https://twitter.com" target="_blank" class="social-icon" data-aos="zoom-in">Twitter</a>
+                <a href="https://instagram.com" target="_blank" class="social-icon" data-aos="zoom-in">Instagram</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Link to external JS files for interactivity and animation -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+    <!-- Initialize AOS Animation -->
+    <script>
+        AOS.init({
+            easing: 'ease-out-back',
+            duration: 1000
+        });
+    </script>
+</body>
+</html>

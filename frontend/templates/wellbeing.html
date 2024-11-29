@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Wellbeing</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('wellbeing') }}">Mental Wellbeing</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="wellbeing-content">
+            <h1>Mental Wellbeing</h1>
+            {% for item in content %}
+                <div class="content-item">
+                    <h2>{{ item['title'] }}</h2>
+                    {% if item['content'] %}
+                        <p>{{ item['content'] }}</p>
+                    {% endif %}
+                    {% if item['image_url'] %}
+                        <img src="{{ item['image_url'] }}" alt="Article Image">
+                    {% endif %}
+                    {% if item['video_url'] %}
+                        <video controls>
+                            <source src="{{ item['video_url'] }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Mental Wellness Platform. All rights reserved.</p>
+    </footer>
+</body>
+</html>
