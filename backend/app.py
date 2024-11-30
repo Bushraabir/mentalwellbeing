@@ -3,8 +3,9 @@ import os
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-from chatbot import BushraChatbot
+
 from flask import render_template
+from .chatbot import BushraChatbot
 
 
 
@@ -363,5 +364,5 @@ def profile():
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Use PORT from the environment or default to 5000
+    port = int(os.environ.get("PORT", 5708))  # Use PORT from the environment or default to 5000
     app.run(host="0.0.0.0", port=port)
