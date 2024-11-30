@@ -1,2 +1,0 @@
-gunicorn backend.app:app
-
