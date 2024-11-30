@@ -24,104 +24,101 @@ POSTS_DIR_PATH = r"F:\c++ Projects\123\website-test\backend\database\chatbot_dat
 POSTS_PATH = r"F:\c++ Projects\123\website-test\backend\database\chatbot_data\posts.db"  # Actual file path
 
 # Ensure the directories exist and do not try to create files
+
 def ensure_directories():
-    # Ensure the necessary directories exist for MAIN_DATABASE_PATH, CHATBOT_DB_PATH, and EMOTIONS_DB_PATH
-    if not os.path.exists(os.path.dirname(MAIN_DATABASE_PATH)):
-        os.makedirs(os.path.dirname(MAIN_DATABASE_PATH), exist_ok=True)
-    
-    if not os.path.exists(os.path.dirname(CHATBOT_DB_PATH)):
-        os.makedirs(os.path.dirname(CHATBOT_DB_PATH), exist_ok=True)
-    
-    if not os.path.exists(os.path.dirname(EMOTIONS_DB_PATH)):
-        os.makedirs(os.path.dirname(EMOTIONS_DB_PATH), exist_ok=True)
+    try:
+        if not os.path.exists(os.path.dirname(MAIN_DATABASE_PATH)):
+            os.makedirs(os.path.dirname(MAIN_DATABASE_PATH), exist_ok=True)
+        
+        if not os.path.exists(os.path.dirname(CHATBOT_DB_PATH)):
+            os.makedirs(os.path.dirname(CHATBOT_DB_PATH), exist_ok=True)
+        
+        if not os.path.exists(os.path.dirname(EMOTIONS_DB_PATH)):
+            os.makedirs(os.path.dirname(EMOTIONS_DB_PATH), exist_ok=True)
 
-    # Ensure the directory for POSTS_PATH exists (without accidentally creating the file)
-    if not os.path.exists(POSTS_PATH):
-        os.makedirs(POSTS_DIR_PATH, exist_ok=True)  # Corrected this line to ensure only directories are created
+        if not os.path.exists(POSTS_PATH):
+            os.makedirs(POSTS_DIR_PATH, exist_ok=True)  # Corrected this line
+    except Exception as e:
+        print(f"Error creating directories: {e}")
+        raise
 
-# Call the function to ensure the directories exist
-ensure_directories()
-
-# Initialize databases and create necessary tables
 def init_databases():
-    """Initializes all databases and creates necessary tables."""
-    # Main database
-    conn = sqlite3.connect(MAIN_DATABASE_PATH)
-    cursor = conn.cursor()
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        email TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL
-    )
-    ''')
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS wellbeing_content (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        description TEXT,
-        media_type TEXT,
-        media_url TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    ''')
-    # Insert the admin user if not already in the database
-    cursor.execute('''
-    INSERT OR IGNORE INTO users (username, email, password)
-    VALUES (?, ?, ?)
-    ''', ("admin", "admin@mentalwellness.com", generate_password_hash("admin123")))
-    conn.commit()
-    conn.close()
+    try:
+        # Main database
+        with sqlite3.connect(MAIN_DATABASE_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE,
+                email TEXT NOT NULL UNIQUE,
+                password TEXT NOT NULL
+            )
+            ''')
+            cursor.execute('''
+            CREATE TABLE IF NOT EXISTS wellbeing_content (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                description TEXT,
+                media_type TEXT,
+                media_url TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            ''')
+            cursor.execute('''
+            INSERT OR IGNORE INTO users (username, email, password)
+            VALUES (?, ?, ?)
+            ''', ("admin", "admin@mentalwellness.com", generate_password_hash("admin123")))
+            conn.commit()
 
-    # Chatbot database
-    conn = sqlite3.connect(CHATBOT_DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS chat_conversations (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        message TEXT NOT NULL,
-        sender TEXT NOT NULL,
-        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    ''')
-    conn.commit()
-    conn.close()
+        # Chatbot database
+        with sqlite3.connect(CHATBOT_DB_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+            CREATE TABLE IF NOT EXISTS chat_conversations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                message TEXT NOT NULL,
+                sender TEXT NOT NULL,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            ''')
+            conn.commit()
 
-    # Emotions database
-    conn = sqlite3.connect(EMOTIONS_DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS detected_emotions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        emotion TEXT NOT NULL,
-        confidence REAL NOT NULL,
-        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    ''')
-    conn.commit()
-    conn.close()
+        # Emotions database
+        with sqlite3.connect(EMOTIONS_DB_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+            CREATE TABLE IF NOT EXISTS detected_emotions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                emotion TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            ''')
+            conn.commit()
 
-    # Initialize the SQLite database for storing posts
-    if not os.path.exists(POSTS_PATH):  # This checks if the posts.db file already exists
-        conn = sqlite3.connect(POSTS_PATH)  # Connecting to the correct file
-        cursor = conn.cursor()
-        cursor.execute('''CREATE TABLE posts (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            title TEXT NOT NULL,
-                            content TEXT NOT NULL,
-                            image_url TEXT,
-                            video_url TEXT,
-                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                        )''')
-        conn.commit()
-        conn.close()
+        # Initialize posts database
+        if not os.path.exists(POSTS_PATH):  # This checks if the posts.db file exists
+            with sqlite3.connect(POSTS_PATH) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''CREATE TABLE posts (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    title TEXT NOT NULL,
+                                    content TEXT NOT NULL,
+                                    image_url TEXT,
+                                    video_url TEXT,
+                                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                )''')
+                conn.commit()
+    except sqlite3.Error as e:
+        print(f"SQLite error: {e}")
+        raise
 
-# Initialize all databases
+# Ensure directories and initialize databases
+ensure_directories()
 init_databases()
-
 # Helper function to connect to a SQLite database
 def get_db_connection(db_path):
     """Returns a connection object to interact with the specified database."""
