@@ -17,11 +17,11 @@ app.secret_key = os.urandom(24)
 
 
 # Paths to the SQLite databases
-MAIN_DATABASE_PATH = r"F:\c++ Projects\123\website-test\backend\database\mental_wellness.db"
-CHATBOT_DB_PATH = r"F:\c++ Projects\123\website-test\backend\database\chatbot_data\chatbot_data.db"
-EMOTIONS_DB_PATH = r"F:\c++ Projects\123\website-test\backend\database\emotiuons_data\emotions_data.db"
-POSTS_DIR_PATH = r"F:\c++ Projects\123\website-test\backend\database\chatbot_data"  # Directory path
-POSTS_PATH = r"F:\c++ Projects\123\website-test\backend\database\chatbot_data\posts.db"  # Actual file path
+MAIN_DATABASE_PATH = os.path.join(os.path.dirname(__file__), 'database/mental_wellness.db')
+CHATBOT_DB_PATH = os.path.join(os.path.dirname(__file__), 'database/chatbot_data/chatbot_data.db')
+EMOTIONS_DB_PATH = os.path.join(os.path.dirname(__file__), 'database/emotions_data/emotions_data.db')
+POSTS_PATH = os.path.join(os.path.dirname(__file__), 'database/chatbot_data/posts.db')
+POSTS_DIR_PATH = os.path.join(os.path.dirname(__file__), 'database/chatbot_data')  # Directory path
 
 # Ensure the directories exist and do not try to create files
 
